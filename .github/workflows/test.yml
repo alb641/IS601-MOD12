@@ -96,7 +96,7 @@ jobs:
         with:
           push: true
           tags: |
-            aliyahb4/is601-mod11:latest
-            aliyahb4/is601-mod11:${{ github.sha }}
+            aliyahb4/is601-mod12:latest
+            aliyahb4/is601-mod12:${{ github.sha }}
           platforms: linux/amd64,linux/arm64
           cache-to: type=inline,mode=max
