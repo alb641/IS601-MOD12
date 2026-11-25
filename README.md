@@ -125,6 +125,8 @@ Docker provides a consistent containerized application environment. Docker Compo
 
 GitHub Actions automates testing, Docker image building, Trivy security scanning, and Docker Hub publishing.
 
+**DockerHub Link:** [https://hub.docker.com/repository/docker/aliyahb4/is601-mod12/general]
+
 ## Repository
 
-**GitHub:** https://github.com/alb641/IS601-MOD12  
+**GitHub:** [https://github.com/alb641/IS601-MOD12] 
