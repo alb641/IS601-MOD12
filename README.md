@@ -1,74 +1,59 @@
-# IS601 Module 11 — FastAPI Calculator with SQLAlchemy and PostgreSQL
-
-**GitHub Repository:** https://github.com/alb641/IS601-MOD11
-
-**GitHub Actions:** https://github.com/alb641/IS601-MOD11/actions
-
-**Docker Hub Username:** aliyahb4
+# IS601 Module 12 — FastAPI Calculator with JWT Authentication and Calculation BREAD
 
 ## Project Overview
 
-This project extends the FastAPI Calculator application by incorporating SQLAlchemy, PostgreSQL, and Pydantic to support database persistence, structured data validation, and arithmetic calculations.
+Module 12 extends the FastAPI Calculator application by integrating JWT-based user authentication with PostgreSQL-backed calculation management. Users can register, log in, and perform Browse, Read, Edit, Add, and Delete (BREAD) operations on their calculations.
 
-The application supports addition, subtraction, multiplication, and division. The project also incorporates automated testing, Docker containerization, GitHub Actions CI/CD, and Trivy vulnerability scanning.
+The application uses SQLAlchemy for database persistence, Pydantic for data validation, and FastAPI dependencies to protect calculation endpoints. Each calculation is associated with a user, ensuring authenticated users can access and manage only their own records.
 
 ## Technologies Used
 
-- Python 3.13
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
+- Python 3.13 and FastAPI
+- PostgreSQL and SQLAlchemy
 - Pydantic
+- JWT authentication and HTTP Bearer security
 - Docker and Docker Compose
 - pytest
-- GitHub Actions
-- Trivy
+- GitHub Actions CI/CD
+- Trivy security scanning
 
 ## Application Features
 
-### SQLAlchemy Calculation Model
+### User Authentication
 
-The application uses SQLAlchemy to represent calculation records stored in PostgreSQL. The model includes calculation identifiers, operands, operation types, and calculation results.
+Users can register through `/users/register` and log in through `/users/login`. Successful authentication returns a JWT access token.
 
-Using SQLAlchemy allows the application to manage database records through Python objects rather than relying on raw SQL for every operation.
+Protected endpoints require a valid Bearer token. The application verifies the token, retrieves the associated user from PostgreSQL, and checks that the account is active.
 
-### Pydantic Validation
+### Calculation BREAD Operations
 
-Pydantic schemas validate incoming calculation requests and structure outgoing responses.
+Operation --> HTTP Method --> Endpoint 
+Add | POST | `/calculations` |
+Browse | GET | `/calculations` |
+Read | GET | `/calculations/{calc_id}` |
+Edit | PUT | `/calculations/{calc_id}` |
+Delete | DELETE | `/calculations/{calc_id}` |
 
-The validation logic checks numeric inputs, supported arithmetic operations, and invalid calculations such as division by zero.
+### User-Specific Data Access
 
-### Arithmetic Operations
+Each calculation contains a `user_id` that identifies its owner. Browse, Read, Edit, and Delete queries filter records using the authenticated user's ID.
 
-The calculator supports the following operations:
+Requests for nonexistent calculations or calculations that do not belong to the authenticated user return a 404 response.
 
-| Operation | Example | Result |
-|---|---|---|
-| Addition | 10 + 5 | 15 |
-| Subtraction | 10 - 5 | 5 |
-| Multiplication | 10 × 5 | 50 |
-| Division | 10 ÷ 5 | 2 |
+### PostgreSQL Persistence
 
-### Calculation Factory
-
-The calculation factory organizes arithmetic operations and separates calculation logic from other application responsibilities.
-
-This improves maintainability and supports future expansion.
-
-### PostgreSQL Integration
-
-PostgreSQL provides persistent data storage, while SQLAlchemy manages interactions between Python models and database tables.
+SQLAlchemy models represent users and calculations, while PostgreSQL stores account information, calculation operands, operation types, and results.
 
 ## Installation and Setup
 
-### Step 1: Clone the Repository
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/alb641/IS601-MOD11.git
-cd IS601-MOD11
+git clone https://github.com/alb641/IS601-MOD12.git
+cd IS601-MOD12
 ```
 
-### Step 2: Create a Virtual Environment
+### 2. Create a Virtual Environment
 
 On Windows PowerShell:
 
@@ -77,84 +62,69 @@ python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
-### Step 3: Install Dependencies
+### 3. Install Dependencies
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-### Step 4: Configure Environment Variables
+### 4. Configure Environment Variables
 
-Configure the PostgreSQL database connection and application authentication settings using environment variables or a local `.env` file.
+Configure `DATABASE_URL`, `TEST_DATABASE_URL`, and `SECRET_KEY` as appropriate for the local environment. Keep secrets out of version control.
 
-Do not commit sensitive credentials to GitHub.
-
-### Step 5: Start PostgreSQL
-
-With Docker Desktop running:
+### 5. Start PostgreSQL
 
 ```powershell
 docker compose up -d db
 ```
 
-### Step 6: Start FastAPI
+### 6. Start FastAPI
 
 ```powershell
 python -m uvicorn main:app --reload
 ```
 
-Application URL: http://127.0.0.1:8000
+**Application:** http://127.0.0.1:8000  
+**Swagger API Documentation:** http://127.0.0.1:8000/docs
 
-Interactive API documentation: http://127.0.0.1:8000/docs
+## Using the API
 
-## Testing
+1. Register an account using `POST /users/register`.
+2. Log in using `POST /users/login`.
+3. Copy the returned JWT access token.
+4. Click Authorize in Swagger and enter the token.
+5. Create, browse, read, update, or delete calculations.
 
-The application uses pytest for unit, integration, end-to-end, and regression testing.
+Example calculation request:
 
-Run the tests using:
+```json
+{
+  "a": 10,
+  "b": 5,
+  "type": "Add"
+}
+```
+
+The calculated result is `15`.
+
+## Automated Testing
+
+The project includes automated tests covering application functionality, database persistence, authentication, and calculation behavior.
+
+Run the complete test suite:
 
 ```powershell
 python -m pytest -q
 ```
 
-**Latest confirmed local results: 94 passed, 1 skipped.**
+**Latest confirmed local result: 94 passed, 1 skipped, 0 failed.**
 
-## Docker
+## Docker and CI/CD
 
-Docker provides a consistent application environment, and Docker Compose simplifies running the application with PostgreSQL.
+Docker provides a consistent containerized application environment. Docker Compose supports the PostgreSQL database service.
 
-Build the Docker image:
+GitHub Actions automates testing, Docker image building, Trivy security scanning, and Docker Hub publishing.
 
-```powershell
-docker build -t is601-mod11 .
-```
+## Repository
 
-Start the services:
-
-```powershell
-docker compose up -d
-```
-
-A `.dockerignore` file excludes unnecessary development files, including local virtual environments, caches, and Git metadata.
-
-## GitHub Actions CI/CD
-
-GitHub Actions automates testing, Docker image building, vulnerability scanning, and image publishing.
-
-**Workflow:** https://github.com/alb641/IS601-MOD11/actions
-
-Trivy is used to scan the Docker image for known security vulnerabilities.
-
-During troubleshooting, the reported vulnerability count was reduced from 26 to 1, eliminating all reported CRITICAL findings.
-
-One HIGH vulnerability involving setuptools remained unresolved. Trivy's exit code was changed to `0` to make findings non-blocking while continuing to report them. This does not resolve the remaining vulnerability as mentioned by Professor in previous feedback.
-
-## Docker Hub Repo
-
-**Docker Hub Repo:** [https://hub.docker.com/u/aliyahb4](https://hub.docker.com/r/aliyahb4/is601-mod11/tags)
-
-The GitHub Actions workflow includes Docker image publishing. The successful publication of the Module 11 image should be confirmed in the workflow logs.
-
-## Project Repository
-
-**GitHub:** https://github.com/alb641/IS601-MOD11
+**GitHub:** https://github.com/alb641/IS601-MOD12  

@@ -1,60 +1,35 @@
-# IS601 Module 11 — Assignment Reflection
+# IS601 Module 12 — Assignment Reflection
 
-**GitHub Repository:** https://github.com/alb641/IS601-MOD11
+**GitHub Repository:** https://github.com/alb641/IS601-MOD12
 
 ## Overview
 
-Module 11 focused on extending the FastAPI Calculator application using SQLAlchemy, PostgreSQL, and Pydantic to support database persistence, input validation, and arithmetic operations. The assignment also incorporated Docker, automated testing, GitHub Actions, and Trivy security scanning.
+Module 12 focused on extending the FastAPI Calculator application by integrating JWT authentication with calculation BREAD operations. Building on the database functionality from previous modules, I worked on connecting user authentication to PostgreSQL so that each user could securely manage their own calculation records.
 
-Through this project, I gained practical experience integrating backend technologies, managing dependencies, and troubleshooting issues involving application functionality and CI/CD security.
+This assignment helped me better understand how authentication, authorization, database persistence, and API endpoints work together in a backend application.
 
 ## Implementation and Testing
 
-I worked on implementing a SQLAlchemy Calculation model to represent arithmetic operations stored in PostgreSQL. I also incorporated Pydantic schemas to validate incoming requests and structure API responses. The calculator supports addition, subtraction, multiplication, and division, including validation for invalid inputs and division by zero.
+I implemented user registration and login endpoints, JWT-based authentication, and protected calculation endpoints using FastAPI dependencies. The calculation functionality supports Browse, Read, Edit, Add, and Delete operations, allowing users to manage their saved calculations.
 
-Automated testing included unit, integration, end-to-end, and regression tests. During development, I resolved compatibility issues involving FastAPI, Starlette, and Jinja2 template responses. I also addressed end-to-end testing delays by improving HTTP request timeout handling.
+An important part of the implementation was connecting each calculation to its owner through a user ID. This allowed the application to filter records by the authenticated user rather than allowing unrestricted access to the database.
 
-After resolving these issues, my latest local test run resulted in **94 passing tests and 1 skipped test**.
+I also used Pydantic schemas for request validation, SQLAlchemy for database interactions, and pytest for automated testing. After troubleshooting the remaining issues, my final local test run resulted in **94 passing tests, 1 skipped test, and 0 failures**.
 
 ## Challenges Encountered
 
-One challenge involved managing dependency updates while maintaining application compatibility. Updating packages to address security concerns sometimes introduced errors that required additional code changes and testing.
+One challenge I faced was getting JWT authentication to work properly in Swagger. I made changes so I could enter my login token and test the endpoints, but those changes caused five of my existing tests to fail. I had to update the code again so both Swagger and the tests would work.
 
-I also encountered Docker configuration issues. During troubleshooting, I discovered that my local Windows virtual environment was being copied into the Docker image. To correct this, I created a '.dockerignore' file to exclude the virtual environment, cache files, Git metadata, and other unnecessary development files.
+I also forgot that my test database was still named `module11_test_db` from the previous module. This caused 29 errors because the database didn't exist in my current PostgreSQL container. Once I created it, most of the errors disappeared.
 
-However, the most significant challenge was resolving the HIGH and CRITICAL vulnerabilities detected by Trivy during the GitHub Actions CI/CD workflow.
-
-## Trivy Security Vulnerability Investigation
-
-I spent several hours investigating security vulnerabilities that prevented the CI/CD workflow from passing. The initial scan reported 26 vulnerabilities, including 23 HIGH and 3 CRITICAL findings.
-
-Throughout troubleshooting, the following results were recorded:
-
-- Initial scan: 26 vulnerabilities (23 HIGH and 3 CRITICAL).
-- Second scan: 16 vulnerabilities (15 HIGH and 1 CRITICAL).
-- Third scan: 17 vulnerabilities (14 HIGH and 3 CRITICAL).
-- Fourth scan: 16 vulnerabilities (14 HIGH and 2 CRITICAL).
-- Fifth scan: 4 vulnerabilities (4 HIGH and 0 CRITICAL).
-- Final scan: 1 vulnerability (1 HIGH and 0 CRITICAL).
-
-Although the intermediate results fluctuated, I reduced the reported vulnerabilities from **26 to 1**, eliminating all reported CRITICAL findings.
-
-To address these vulnerabilities, I updated FastAPI and Starlette, replaced the previous JWT library with PyJWT, upgraded Python packaging tools, modified the Dockerfile, and repeatedly rebuilt the Docker image without cache. I also examined Trivy's JSON reports, inspected package metadata and Docker image layers, and excluded unnecessary files using `.dockerignore`.
-
-Despite these changes, one HIGH vulnerability remained: **CVE-2025-47273**, involving setuptools version 70.3.0. Trivy identified version 78.1.1 or later as containing the security fix.
-
-I upgraded setuptools to version **84.2.1** and confirmed that it was installed inside the Docker container. However, Trivy continued reporting the older version. Even after investigating the image layers and rebuilding the container, I could not conclusively determine the cause.
-
-Due to the assignment deadline, I changed Trivy's `exit-code` setting from `1` to `0`, allowing the CI/CD workflow to continue while keeping the security scan enabled. I recognize that this change does not resolve the vulnerability; it only prevents the finding from automatically failing the workflow.
+Lastly, I kept getting 404 errors in Swagger because I was using the example calculation ID instead of an actual database record. This taught me to pay closer attention to API responses when testing endpoints.
 
 ## Reflection
 
-This assignment strengthened my understanding of how backend development, database integration, automated testing, and CI/CD work together. Using SQLAlchemy and Pydantic reinforced the importance of organizing application logic, managing persistent data, and validating user input.
+This module helped me better understand how authentication works beyond just logging in. I learned how to protect user information and make sure users can only access their own records.
 
-The most valuable learning experience came from troubleshooting Docker and Trivy. I became more familiar with dependency management, Docker build contexts, image layers, and interpreting vulnerability reports. I also learned that upgrading a package does not always immediately eliminate a security finding and that passing functional tests does not necessarily mean an application is secure.
+I already know to pay attention to error codes and normally I would be overwhelmed by a bunch of failed errors but I'm glad this time I noticed it was just missing database. 
 
-The security investigation was particularly frustrating because I spent hours attempting to resolve the final vulnerability despite having a functioning application. However, the experience showed me that software development requires persistence, problem-solving, and an understanding of systems beyond the application code itself.
+Overall, Module 12 helped me become more comfortable with JWT authentication, database operations, and troubleshooting. Moving forward, I want to be more careful with my database setup and check my configurations earlier to avoid unnecessary errors.
 
-In future projects, I would incorporate security scanning earlier in development, monitor dependency versions more consistently, and use cleaner Docker build strategies to simplify troubleshooting. I would also allocate more time to investigating CI/CD issues before approaching a deadline.
-
-**GitHub Repository:** https://github.com/alb641/IS601-MOD11
+**GitHub Repository:** https://github.com/alb641/IS601-MOD12
