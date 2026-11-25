@@ -21,3 +21,5 @@ class CalculationFactory:
             return data.a / data.b
 
         raise ValueError("Invalid calculation type")
+
+
